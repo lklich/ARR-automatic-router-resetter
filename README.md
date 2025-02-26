@@ -1,4 +1,4 @@
-# Automatic Router Reseter with web configuration
+# Automatic Router Reseter with web configuration ESP32 AsyncWebServer
 
 author: Leszek Klich (c) 2025
 
