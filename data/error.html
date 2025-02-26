@@ -1,0 +1,29 @@
+<!DOCTYPE html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:,"><title>System error</title><link href="/style" rel="stylesheet" />
+    </head><body><main class="container">
+        <h2><center>UWAGA! System damage</center></h2>
+    <p><center>Copy the content of the window below and send it to the system author via e-mail.</p></center>
+    
+    <textarea id="fileContent" rows="20"></textarea>
+    </main>
+    <footer>
+        <center><small>author: Leszek Klich leszek.klich@gmail.com - version: {{version}}</small></center>
+    </footer>   
+    <script>
+        async function loadFile() {
+            try {
+                const response = await fetch('/log.txt');
+                if (response.ok) {
+                    const text = await response.text();
+                    document.getElementById('fileContent').value = text;
+                } else {
+                    console.error('Network error: ', response.status);
+                }
+            } catch (error) {
+                console.error('Error: ', error);
+            }
+        }
+    
+        window.onload = loadFile;
+    </script>
+    </body></html>

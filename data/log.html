@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,"><title>System log</title><link href="/style" rel="stylesheet" />
+</head><body>
+<main class="container">
+    <nav>
+        <ul>
+          <li><strong>{{name}} ({{place}})</strong></li>
+        </ul>
+        <ul>
+          <li><a href="/">Start</a></li>
+          <li><a href="/update">Update</a></li>
+          <li><a href="/config">Configuration</a></li>
+        </ul>
+      </nav>
+
+    <p><center>System log viewer</p></center>
+    <textarea id="fileContent" rows="15"></textarea>
+</main>
+<footer>
+    <center><small>author: Leszek Klich leszek.klich@gmail.com - version: {{version}}</small></center>
+</footer>   
+</body>
+</html>
+
+<script>
+    async function loadFile() {
+        try {
+            const response = await fetch('/logtxt');
+            if (response.ok) {
+                const text = await response.text();
+                document.getElementById('fileContent').value = text;
+            } else {
+                console.error('Network error: ', response.status);
+            }
+        } catch (error) {
+            console.error('Error: ', error);
+        }
+    }  
+window.onload = loadFile;
+</script>

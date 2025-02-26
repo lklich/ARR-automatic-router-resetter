@@ -1,0 +1,80 @@
+<!DOCTYPE html><html lang="pl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,"><title>Configuration</title><link href="/style" rel="stylesheet" />
+</head><body>
+<main class="container">
+    <span hidden id="DHCP">%DHCP%</span>
+    <span hidden id="ENABLED">%ENABLED%</span>
+    <span hidden id="TIME">%TIME%</span>
+    <span hidden id="TIMEOUT">%TIMEOUT%</span>
+    <span hidden id="MQTT">%MQTT%</span>
+    <nav>
+    <ul>
+        <li><strong>%NAME% (%PLACE%)</strong></li>
+    </ul>
+    <ul>
+        <li><a href="/">Start</a></li>
+        <li><a href="/log">Log</a></li>
+        <li><a href="/update">Update</a></li>
+    </ul>
+    
+    </nav>
+        <h2><center>System configuration</center></h2>
+        <div class="grid">
+         <button class="secondary" onclick="logout_handler()">Logout</button>
+         <div></div>
+         <button class="primary" onclick="reboot_handler()">Device restart</button>
+         <div></div>
+         <button class="secondary" onclick="clear_handler()">Clear log</button>
+        </div>
+        <hr />
+
+        <form action='/configsave'><fieldset>
+        <label><b>List of available WiFi networks (select)</b></label>
+        <select id="networkCombo">
+            <option value="">-- Select network --</option>
+        </select>
+        <label><b>Home WiFi configuration setup</b></label>
+        <label>SSID - home network<input name="ssid" placeholder="Home SSID" type="text" maxlength="30" value="%SSID%" id="ssid" required /></label>
+        <label>WiFi passsword<input name="wifipass" placeholder="Password for WiFi network" type="text" maxlength="31" value="%WIFIPASS%" id="wifipass" required /></label>
+        <label>Instalation place<input name="place" placeholder="Installation place, for egz. quest room" type="text" maxlength="60" value="%PLACE%" id="place" required /></label>
+        <!-- <label>Czas letni (1) lub zimowy (2)<input name="timeoffset" type="number" placeholder="1" min="1" max="2" value="%TIMEOFFDSET%" id="timeoffset" required /></label> -->
+        <hr />
+        <label><b>Configuring connection testing and router reset</b></label>
+        <label>IP address for test<input name="iptest" placeholder="8.8.8.8" class="ipv4" type="text" maxlength="15" value="%IPTEST%" id="iptest" required pattern="^(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)$" /></label>
+        <label>How long after restart to start network testing? (seconds)<input name="starttest" type="number" placeholder="10" min="10" max="90" value="%STARTTEST%" id="starttest" required /></label>                  
+        <label>Reboot router for seconds<input name="time" type="number" placeholder="5" min="1" max="10" value="%TIME%" id="time" required /></label>                  
+        <label>After how many incorrect attempts should the router be restarted?<input name="timeout" type="number" placeholder="5" min="1" max="10" value="%TIMEOUT%" id="timeout" required /></label>                  
+        <label><input type="checkbox" name="enabled" id="enabled" />Reset active (will reset router)</label>
+        <hr />
+        <label><b>Enable DHCP (automatic network configuration)</b></label>
+        <label><input type="checkbox" name="dhcp" id="dhcp" />Configure automatically via DHCP (recommended)</label>
+        <hr />
+        <label><b>Manual network configuration device</b></label>
+        <label>IP address<input name="ip" placeholder="192.168.0.23" class="ipv4" type="text" maxlength="15" value="%IP%" id="ip" required pattern="^(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)$" /></label>
+        <label>Netmask<input name="netmask" placeholder="255.255.255.0" class="ipv4" type="text" maxlength="15" value="%NETMASK%" id="netmask" required pattern="^(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)$" /></label>
+        <label>Gateway (router address)<input name="gateway" placeholder="192.168.0.1" class="ipv4" type="text" maxlength="15" value="%GATEWAY%" id="gateway" required pattern="^(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)$" /></label>
+        <label>DNS server (for egz. router address)<input name="dns" placeholder="192.168.0.1" class="ipv4" type="text" maxlength="15" value="%DNS%" id="dns" required pattern="^(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)$" /></label>
+        <hr />
+        <label><b>Security - login and password for device configuration</b></label>
+        <label>User name (admin)<input name="user" placeholder="admin" type="text" maxlength="9" value="%USER%" id="user" required /></label>
+        <label>User password<input name="pass" placeholder="admin" type="text" maxlength="19" value="%PASS%" id="pass" required /></label>
+        <hr />
+        
+        <label><b>MQTT broker connection config (Home Assisstant)</b></label>
+        <label><input type="checkbox" name="mqtt" id="mqtt" />Connect and send data to MQTT</label>
+        <label>MQTT IP address broker<input name="mqttbroker" placeholder="192.168.0.6" class="ipv4" type="text" maxlength="15" value="%MQTTBROKER%" id="mqttbroker" pattern="^(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)$" /></label>
+        <label>MQTT port (1883)<input name="mqttport" type="number" placeholder="1883" min="1" max="40000" value="%MQTTPORT%" id="mqttport" /></label>                  
+        <label>MQTT user name<input name="mqttuser" placeholder="mqtt_user" type="text" maxlength="29" value="%MQTTUSER%" id="mqttuser" /></label>
+        <label>MQTT password for user<input name="mqttpass" placeholder="mqtt_password" type="text" maxlength="19" value="%MQTTPASS%" id="mqttpass" /></label>
+
+        <input type="submit" value="Save changes">
+        </fieldset>
+        </form>
+        </main>
+    <footer>
+        <center><small>author: Leszek Klich leszek.klich@gmail.com - version: %VERSION%</small></center>
+    </footer>   
+    <script src="/configjs"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="pl"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" /><meta name="author" content="Leszek Klich" />
+    <title>Automatic Resetter</title><link rel="stylesheet" href="/style">
+  </head><body>    
+    <main class="container">
+      <span hidden id="myIP">{{ip}}</span>
+      <span hidden id="wifi">{{wifi}}</span>
+      <span hidden id="iptest">{{iptest}}</span>
+      <nav>
+        <ul>
+          <li><strong>{{name}} ({{place}})</strong></li>
+        </ul>
+        <ul>
+          <li><a href="/">Start</a></li>
+          <li><a href="/log">Log</a></li>
+          <li><a href="/config">Config</a></li>
+        </ul>
+      </nav>
+      <hr />
+      <div class="grid">
+        <div><b>WiFi:</b> {{ssid}}</div>
+        <div><b>Test IP:</b> {{iptest}}</div>
+        <div><b>Reset after </b> {{timeout}} <b>tests (1 test = 5 sec.)</b></div>
+      </div>
+      <hr />
+     
+      <div class="row">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">State</th>
+              <th scope="col">Signal strench</th>
+              <th scope="col">Reset active</th>
+            </tr>
+          </thead>
+          <tbody>
+            <td><div class="col" style="border: hidden;" id="state">Waiting...</div></td>
+            <td><div class="col" style="border: hidden;" id="wifi">{{wifi}}</div></td>
+            <td><div class="col" style="border: hidden;" id="enable">{{enable}}</div></td>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row">Internet uptime:</th>
+              <td><p id="timeok" style="display: inline;">00:00:00</p></td>
+              <td>Ok/Ping error: (<span id="countok">0</span>/<span id="counterr">0</span>)</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+  
+        <textarea id="log" rows="10" placeholder="connection failure log..." readonly></textarea>
+        </div>
+      </main>
+
+        <footer>
+          <center><small>author: Leszek Klich leszek.klich@gmail.com - version: {{version}}</small></center>
+        </footer>     
+    <script src="/scriptjs"></script>
+  </body>
+</html>
+  

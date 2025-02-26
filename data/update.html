@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="pl"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" /><meta name="author" content="Leszek Klich" />
+<title>Update</title><link href="/style" rel="stylesheet" />
+</head><body><main class="container">
+<nav><ul><li><strong>{{name}} ({{place}})</strong></li></ul><ul><li><a href="/">Start</a></li><li><a href="/log">Log systemu</a></li>
+<li><a href="/config">Configuration</a></li></ul></nav>
+<center>Firmware update</center>
+<center><h3>Current version: {{version}}</h3></center>
+<center><p>Caution! Improper use may result in damage to the device.</p></center>
+<center><p>The update file has the extension .arr</p></center>
+<form method='POST' action='/doUpdate' enctype='multipart/form-data'>
+<fieldset>
+<div class="grid">
+<div><input type="file" name="update" accept=".arr" required></div>
+</div>
+<div class="grid">
+<div></div>
+<div><input type='submit' value='Update'></div>
+<div></div>
+</div>
+</fieldset></form>
+<center><p><i>Select the file and click Update to update your device</p></center>
+</main><footer><center><small>author: Leszek Klich leszek.klich@gmail.com - verson: {{version}}</small></center></footer>
+<script src="/scriptjs"></script>
+</body></html>
