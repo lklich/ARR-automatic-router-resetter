@@ -26,26 +26,27 @@ Automatyczny Reseter Routera z konfiguracją przez interfejs Web przy wykorzysta
 bool isRebootRequired = false;
 bool isClearLog = false;
 bool connected = false;
+bool started = false;
 
-int8_t rssi = 0;         // moc sygnału WiFi
-long countDisconnect = 0; // ilość niedostępnych pingow;
-long countConnect = 0;   // ilość dostępnych pingow;
-struct tm timeInfo;   // Struktura do przechowywania daty i czasu
+int8_t rssi = 0;           // signal strench
+long countDisconnect = 0;  // count error ping
+long countConnect = 0;     // count ping ok
+struct tm timeInfo;        // Datetime struct
 time_t now;
 String actTime = "00:00:00";
 String actDate = "0000-00-00";
 
-// Zmienne dla strony Www
-String act_rssi_percent = "0";
+String act_rssi_percent = "0"; // Variable for www template
 
 ConfigManager configManager;
 Relay relay(RELAY_PIN);
 WiFiManager wifi; 
 
-Thread wifiTestThread = Thread();
-Thread testingPingThread = Thread();
-Thread ntpTimeThread = Thread();
-Thread actDateTimeThread = Thread();
+Thread wifiTestThread = Thread();     // WiFi testing
+Thread testingPingThread = Thread();  // Ping test
+Thread ntpTimeThread = Thread();      // Get datetime from NTP server
+Thread actDateTimeThread = Thread();  // Refresh datetime
+Thread startTestThread = Thread();    // Delay first time start test after router reset
 
 MQTTCli mqttHandler; 
 
@@ -59,6 +60,7 @@ void actualizeTime();
 void writeLog(const char* message);
 void clearLog();
 void mqttSend();
+void startTest();
 // --------------------------------------
 
 void setup() {
@@ -89,16 +91,19 @@ void setup() {
     String per_rssi = "WIFI RSSI: " + act_rssi_percent + "%";
     Logger::getInstance().log(LOG_INFO, per_rssi.c_str());
     wifiTestThread.onRun(checkWiFi);
-    wifiTestThread.setInterval(5000);  // 3600
+    wifiTestThread.setInterval(5000);     // Test WiFi connection every 5 second
   
     testingPingThread.onRun(runTestPing);
-    testingPingThread.setInterval(5000);
+    testingPingThread.setInterval(5000);  // Test ping connection every 5 second
   
     ntpTimeThread.onRun(timeFromNTP);
-    ntpTimeThread.setInterval(1800000); //pół godziny
+    ntpTimeThread.setInterval(1800000);   // Get time from NTP every half time
 
     actDateTimeThread.onRun(actualizeTime);
-    actDateTimeThread.setInterval(1000);
+    actDateTimeThread.setInterval(1000);  // REfrest datetime every 1 second
+
+    startTestThread.onRun(startTest);
+    startTestThread.setInterval(config.starttest * 1000); // Delay ping test every router restart and run device
 
     timeFromNTP();
     
@@ -113,13 +118,22 @@ void setup() {
   Logger::getInstance().log(LOG_INFO, "SYSTEM STARTED");
 }
 
+void startTest(){
+  if(!started){
+    String ii = "DELAY " + String(config.starttest) + " SEC. START";
+    Logger::getInstance().log(LOG_INFO, ii.c_str());
+    writeLog("Enable testing");
+    startTestThread.enabled = false;
+    started = true;
+  }
+}
+
 void mqttSend(){
  if((wifi.isWiFiOK()) && (config.mqtt)){
-    const char *stateMsg = relay.isOn() ? "OFF" : "ON"; // odwrócona logika: przekaźnik wyłączony = zasilanie włączone
+    const char *stateMsg = relay.isOn() ? "OFF" : "ON"; // inverted logic: relay off = power on
     if (!mqttHandler.publishState(stateMsg)) {
       Serial.println("Błąd publikacji MQTT - nie wysłano stanu!");
   }
-   // mqttHandler.publish("home/reseter/relay", stateMsg);
  }
 }
 
@@ -168,9 +182,9 @@ void timeFromNTP(){
 }
 }
 
-// Funkcja zapisująca log do pliku logs.txt
+// Function that saves the log to the logs.txt file
 void writeLog(const char* message) {
-  // Sprawdzenie rozmiaru pliku i czyszczenie, gdy przekracza 50KB
+  // File size check and cleanup if it exceeds 50KB
   if (LittleFS.exists("/nettest.txt")) {
     File checkFile = LittleFS.open("/nettest.txt", FILE_READ);
     if (checkFile.size() > 50 * 1024) {  // 50 * 1024 bajtów = 50KB
@@ -187,14 +201,14 @@ void writeLog(const char* message) {
     mess = "[" + actDate + "] [" + actTime + "] " + message;
   File logFile = LittleFS.open("/nettest.txt", FILE_APPEND);
   if (!logFile) {
-    Logger::getInstance().log(LOG_ERROR, "ERROR READ nettest.txt");
+    Logger::getInstance().log(LOG_ERROR, "ERROR READ NETTEST.TXT");
     return;
   }
   logFile.println(mess);
   logFile.close();
 }
 
-// Funkcja usuwająca log
+// Clear log file
 void clearLog() {
   if (LittleFS.exists("/nettest.txt")) {
     File myFile = LittleFS.open("/nettest.txt", "w");
@@ -211,7 +225,7 @@ void clearLog() {
 
 void checkWiFi(){
   if (!wifi.isWiFiOK()) {
-    connected = false; // Brak WiFi to też błąd!
+    connected = false; // Lack of WiFi is a error!
     ntpTimeThread.enabled = false;
     act_rssi_percent = "0";
     rssi = 0;
@@ -224,7 +238,7 @@ void checkWiFi(){
 }
 
 void resetBtnClick(){
-    uint8_t counter = 10; // ile sekund trzymać przycisk na factory reset
+    uint8_t counter = 10; // how many seconds to hold the factory reset button
     Serial.print("RSTBTN ");
     while(digitalRead(BTN_PIN) == LOW){
       Serial.print(counter); Serial.print(",");
@@ -246,6 +260,7 @@ void resetBtnClick(){
 }  
 
 void runTestPing(){
+ if(!started) return;
  if (wifi.isWiFiOK() && (config.confMode == 0)) {
   act_rssi_percent = String(wifi.getRSSI());
   IPAddress remote_ip(8,8,8,8);
@@ -264,7 +279,7 @@ void runTestPing(){
   } else {
       if(config.confMode == 0){
         Logger::getInstance().log(LOG_ERROR, "WIFI ERROR");
-        countDisconnect++; // jeśli brak WiFi to też zwiększ.
+        countDisconnect++; // if no WiFi increase
         connected = false;
       }
     }
@@ -290,26 +305,33 @@ void loop() {
   if (testingPingThread.shouldRun())
     testingPingThread.run();
 
-  if (actDateTimeThread.shouldRun()) // Aktualizacja czasu co sekundę
+  if (actDateTimeThread.shouldRun()) // Refresh datetime every 1 second
     actDateTimeThread.run();
+
+  if (startTestThread.shouldRun())  // config.starttest (delay run test after router rebot)
+    startTestThread.run();
 
   if (isRebootRequired) {
     Logger::getInstance().log(LOG_INFO, "RESTART");
-		delay(1000); // żeby zdążyła załadować się strona reboot.html
+		delay(1000); // Delay for reboot.html page can load
 		ESP.restart();
   }
 
-  // włączenie przekaźnika, gdy connected = false i countDisconnect >= config.timeout
+  // switching on the relay when connected = false i countDisconnect >= config.timeout
   if (countDisconnect >= config.timeout) {
     Logger::getInstance().log(LOG_ERROR, "ROUTER RESTART");
     if (config.confMode == 0){
       writeLog("ROUTER RESTART");
       Logger::getInstance().log(LOG_INFO, "MQTT RESET");
-      relay.turnOn(); // Czekaj aż przekaźnik się wyłączy (synchronicznie)
+      relay.turnOn(); // Enable relay (async)
       mqttSend();
       countDisconnect = 0;
       countConnect = 0;
+      started = false;
+      startTestThread.enabled = true;
     } else {
+      started = false;
+      startTestThread.enabled = false;
       countDisconnect = 0;
       countConnect = 0;
     }

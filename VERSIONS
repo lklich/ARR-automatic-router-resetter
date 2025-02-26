@@ -1,0 +1,11 @@
+# Version description
+
+## Version 1.9.1 
+
+- add delay after router reboot and start device (*started* variable).
+
+- add JSON *"started":"0"* or *"started":"1"* on /data endpoint.
+
+```
+{ "date":"2025-02-26",  "time":"14:57:14",  "enable":"Tak", "rssi":"-40", "rssip":"100", "connected":"1", "countok":"0", "counterr":"0", "started":"0" }
+```

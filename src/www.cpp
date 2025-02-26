@@ -205,7 +205,8 @@ void routing() {
     if (connected) conn = "1"; else conn = "0";
     String resp = "{ \"date\":\"" + actDate + "\",  \"time\":\"" + actTime + "\",  \"enable\":\"" + en + "\", \"rssi\":\"" + String(rssi) 
                     + "\", \"rssip\":\"" + String(act_rssi_percent) + "\", \"connected\":\"" + String(connected) 
-                    + "\", \"countok\":\"" + String(countConnect) + "\", \"counterr\":\"" + String(countDisconnect) + "\" }"; 
+                    + "\", \"countok\":\"" + String(countConnect) + "\", \"counterr\":\"" + String(countDisconnect) 
+                    + "\", \"started\":\"" + String(started) + "\" }"; 
       request->send_P(200, "text/plain", resp.c_str());
     });
 

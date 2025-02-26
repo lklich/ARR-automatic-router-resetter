@@ -10,6 +10,7 @@
 extern bool isRebootRequired;
 extern bool isClearLog;
 extern bool connected;
+extern bool started;
 extern long countConnect;
 extern long countDisconnect;
 extern String act_rssi_percent;
