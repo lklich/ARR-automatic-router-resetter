@@ -164,9 +164,26 @@ lib_deps =
 
 ### Upload
 
-* Upload data folder: go to PlatffomIO menu and execute/przejdź do menu PlatffomIO i wykonaj **Upload Filesystem Image**
+First upload filesystem and firmware.
 
-* Nest upload firmware using command **Upload**/Następnie prześlij firmware poleceniem **Upload**.
+**Esptool**:
+
+First erase flash:
+
+esptool.py --chip esp32 --port /dev/ttyXXX erase_flash
+
+Next upload:
+
+1. esptool.py --chip esp32 --port /dev/ttyXXX --baud 115200 write_flash 0x290000 firmware/filesystem.bin
+
+2. esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 115200 write_flash -z 0x10000 firmware/firmware.arr (or .bin)
+
+
+**PlatformIO**:
+
+1. Upload data folder: go to PlatffomIO menu and execute/przejdź do menu PlatffomIO i wykonaj **Upload Filesystem Image**
+
+2. Next upload firmware using command **Upload**/Następnie prześlij firmware poleceniem **Upload**.
 
 
 ### Pinout:
