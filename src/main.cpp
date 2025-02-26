@@ -1,3 +1,10 @@
+/*
+author Leszek Klich
+Licence: see LICENSE file
+Automatic Router Reseter with web configuration - ESP32 Lolin Lite - AsyncWebServer
+Automatyczny Reseter Routera z konfiguracją przez interfejs Web przy wykorzystaniu - AsyncWebServer
+*/
+
 #include <Arduino.h>
 #include <logger.h>
 #include <pinout.h>

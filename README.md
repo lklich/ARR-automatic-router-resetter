@@ -4,7 +4,7 @@ author: Leszek Klich (c) 2025
 
 * English: Automatic Router Resetter – Device Description
 
-* Polski: Automatyczny Reseter Routea - Opis urządzenia. 
+* Polski: Automatyczny Reseter Routera - Opis urządzenia. 
 
 ![Main site](images/resetmain.png)
 
